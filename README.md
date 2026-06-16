@@ -2,7 +2,7 @@
 
 Project page for **ScenA: Reference-Driven Multi-Speaker Audio Scene Generation from In-the-Wild Priors**.
 
-Michael Finkelson, Daniel Segal, Eitan Richardson, Shahar Armon, Nani Goldring, Poriya Panet, Benjamin Brazowski, Or Patashnik, Yoav HaCohen.
+Michael Finkelson, Daniel Segal, Eitan Richardson, Shahar Armon, Nani Goldring, Poriya Panet, Nir Zabari, Benjamin Brazowski, Or Patashnik, Yoav HaCohen.
 Lightricks · Tel Aviv University.
 
 🔗 Live page: https://finmickey.github.io/scena/
