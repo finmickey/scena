@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ScenA: Reference-Driven Multi-Speaker Audio Scene Generation from In-the-Wild Priors. A text-to-audio flow-matching model that binds multiple reference voices to a free-form scene description.">
+    <meta property="og:title" content="ScenA: Reference-Driven Multi-Speaker Audio Scene Generation from In-the-Wild Priors"/>
+    <meta property="og:description" content="A flow-matching foundation model that conditions on multiple reference voices and a free-form text prompt to generate full conversational scenes."/>
+    <meta property="og:image" content="static/images/og_banner.png"/>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="static/images/og_banner.png">
+    <meta name="keywords" content="multi-speaker, audio scene, flow matching, text-to-audio, reference conditioning, in-the-wild speech, dialogue generation">
+
+    <title>ScenA: Reference-Driven Multi-Speaker Audio Scene Generation</title>
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/normalize.css">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/custom.css?v=2">
+</head>
+<body>
+
+<div class="container">
+<header role="banner"></header>
+<main role="main">
+<article>
+
+
+<!-- Header card -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card header-card">
+    <div class="text-center">
+        <h1 class="title-main">ScenA</h1>
+        <h2 class="title-sub">Reference-Driven Multi-Speaker Audio Scene Generation from In-the-Wild Priors</h2>
+        <p>
+            <span class="author-block">Michael Finkelson<sup>1,2</sup>,</span>
+            <span class="author-block">Daniel Segal<sup>1</sup>,</span>
+            <span class="author-block">Eitan Richardson<sup>1</sup>,</span>
+            <span class="author-block">Shahar Armon<sup>1</sup>,</span>
+            <span class="author-block">Nani Goldring<sup>1</sup>,</span>
+            <span class="author-block">Poriya Panet<sup>1</sup>,</span>
+            <span class="author-block">Benjamin Brazowski<sup>1</sup>,</span>
+            <span class="author-block">Or Patashnik<sup>2</sup>,</span>
+            <span class="author-block">Yoav HaCohen<sup>1</sup></span>
+        </p>
+        <p class="affiliation">
+            <sup>1</sup>Lightricks &nbsp;&nbsp; <sup>2</sup>Tel Aviv University
+        </p>
+        <div class="link-buttons">
+            <span class="link-button soon"><i class="fa-brands fa-github"></i> Inference Code <span class="soon-badge">Coming Soon</span></span>
+            <span class="link-button soon"><svg class="hf-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="currentColor"><path d="M12.025 1.13c-5.77 0-10.449 4.647-10.449 10.378 0 1.112.178 2.181.503 3.185.064-.222.203-.444.416-.577a.96.96 0 0 1 .524-.15c.293 0 .584.124.84.284.278.173.48.408.71.694.226.282.458.611.684.951v-.014c.017-.324.106-.622.264-.874s.403-.487.762-.543c.3-.047.596.06.787.203s.31.313.4.467c.15.257.212.468.233.542.01.026.653 1.552 1.657 2.54.616.605 1.01 1.223 1.082 1.912.055.537-.096 1.059-.38 1.572.637.121 1.294.187 1.967.187.657 0 1.298-.063 1.921-.178-.287-.517-.44-1.041-.384-1.581.07-.69.465-1.307 1.081-1.913 1.004-.987 1.647-2.513 1.657-2.539.021-.074.083-.285.233-.542.09-.154.208-.323.4-.467a1.08 1.08 0 0 1 .787-.203c.359.056.604.29.762.543s.247.55.265.874v.015c.225-.34.457-.67.683-.952.23-.286.432-.52.71-.694.257-.16.547-.284.84-.285a.97.97 0 0 1 .524.151c.228.143.373.388.43.625l.006.04a10.3 10.3 0 0 0 .534-3.273c0-5.731-4.678-10.378-10.449-10.378M8.327 6.583a1.5 1.5 0 0 1 .713.174 1.487 1.487 0 0 1 .617 2.013c-.183.343-.762-.214-1.102-.094-.38.134-.532.914-.917.71a1.487 1.487 0 0 1 .69-2.803m7.486 0a1.487 1.487 0 0 1 .689 2.803c-.385.204-.536-.576-.916-.71-.34-.12-.92.437-1.103.094a1.487 1.487 0 0 1 .617-2.013 1.5 1.5 0 0 1 .713-.174m-10.68 1.55a.96.96 0 1 1 0 1.921.96.96 0 0 1 0-1.92m13.838 0a.96.96 0 1 1 0 1.92.96.96 0 0 1 0-1.92M8.489 11.458c.588.01 1.965 1.157 3.572 1.164 1.607-.007 2.984-1.155 3.572-1.164.196-.003.305.12.305.454 0 .886-.424 2.328-1.563 3.202-.22-.756-1.396-1.366-1.63-1.32q-.011.001-.02.006l-.044.026-.01.008-.03.024q-.018.017-.035.036l-.032.04a1 1 0 0 0-.058.09l-.014.025q-.049.088-.11.19a1 1 0 0 1-.083.116 1.2 1.2 0 0 1-.173.18q-.035.029-.075.058a1.3 1.3 0 0 1-.251-.243 1 1 0 0 1-.076-.107c-.124-.193-.177-.363-.337-.444-.034-.016-.104-.008-.2.022q-.094.03-.216.087-.06.028-.125.063l-.13.074q-.067.04-.136.086a3 3 0 0 0-.135.096 3 3 0 0 0-.26.219 2 2 0 0 0-.12.121 2 2 0 0 0-.106.128l-.002.002a2 2 0 0 0-.09.132l-.001.001a1.2 1.2 0 0 0-.105.212q-.013.036-.024.073c-1.139-.875-1.563-2.317-1.563-3.203 0-.334.109-.457.305-.454m.836 10.354c.824-1.19.766-2.082-.365-3.194-1.13-1.112-1.789-2.738-1.789-2.738s-.246-.945-.806-.858-.97 1.499.202 2.362c1.173.864-.233 1.45-.685.64-.45-.812-1.683-2.896-2.322-3.295s-1.089-.175-.938.647 2.822 2.813 2.562 3.244-1.176-.506-1.176-.506-2.866-2.567-3.49-1.898.473 1.23 2.037 2.16c1.564.932 1.686 1.178 1.464 1.53s-3.675-2.511-4-1.297c-.323 1.214 3.524 1.567 3.287 2.405-.238.839-2.71-1.587-3.216-.642-.506.946 3.49 2.056 3.522 2.064 1.29.33 4.568 1.028 5.713-.624m5.349 0c-.824-1.19-.766-2.082.365-3.194 1.13-1.112 1.789-2.738 1.789-2.738s.246-.945.806-.858.97 1.499-.202 2.362c-1.173.864.233 1.45.685.64.451-.812 1.683-2.896 2.322-3.295s1.089-.175.938.647-2.822 2.813-2.562 3.244 1.176-.506 1.176-.506 2.866-2.567 3.49-1.898-.473 1.23-2.037 2.16c-1.564.932-1.686 1.178-1.464 1.53s3.675-2.511 4-1.297c.323 1.214-3.524 1.567-3.287 2.405.238.839 2.71-1.587 3.216-.642.506.946-3.49 2.056-3.522 2.064-1.29.33-4.568 1.028-5.713-.624"/></svg> Model Checkpoint <span class="soon-badge">Coming Soon</span></span>
+        </div>
+    </div>
+    <p style="text-align: center; margin-top: 1rem;">
+        <img class="teaser" src="static/images/teaser.png?v=3" width="1200" height="252" alt="ScenA teaser: a high-level natural-language prompt and a set of reference voices are transformed into a multi-speaker conversational scene with overlapping speech, paralinguistic events, and ambient audio.">
+    </p>
+    <p class="teaser-caption">
+        Our <strong>ScenA</strong> framework transforms free-form natural language prompts and a set of reference voices
+        into rich, multi-speaker conversational scenes. The prompt alone determines which reference speaks where, with
+        no per-turn tags, transcripts, or identity encoders. This natural language interface enables complex human
+        interactions, including overlapping speech, spontaneous paralinguistic events, and scene-level ambient sound.
+    </p>
+    <p style="margin-top: 1.5rem;">
+        <b>Abstract.</b>
+        Existing multi-speaker dialogue systems bind speakers to utterances through structured supervision:
+        per-turn tags, multi-stream transcriptions, or learnable speaker embeddings. These systems operate within
+        speech-only pipelines that produce clean vocal sequences without the ambient texture of real conversations.
+        We take a different approach. Our method, <strong>ScenA</strong>, conditions a text-to-audio flow-matching
+        foundation model, pretrained on large-scale in-the-wild data, directly on multiple reference voices and a
+        free-form natural language prompt that describes an entire multi-speaker audio scene. Leveraging such a
+        foundational model allows us to inherit its capacity for natural, non-studio audio: background noise, room
+        acoustics, overlapping dialogue, and spontaneous paralinguistic events, while adding multi-speaker control
+        without any per-turn structure. Concretely, reference latents are concatenated into the model's token
+        sequence and distinguished by lightweight identity-aware positional encodings. However, we identify a
+        critical obstacle to this approach: the <em>Reference Shortcut</em>.
+    </p>
+    <p>
+        During training under standard noise schedules, the model can identify the matching reference by acoustic
+        similarity to the noisy target, bypassing the text prompt entirely. We address this with a high-noise-biased
+        timestep distribution that forces the model to rely on the text prompt for speaker assignment. We evaluate
+        <strong>ScenA</strong> on the CoVoMix2-Dialogue benchmark, showing that it outperforms existing multi-speaker
+        systems on speaker-binding metrics while generating rich conversational audio with overlapping speech,
+        emotional vocalizations, and ambient sound. Our results demonstrate the advantage of using a general-purpose
+        audio model conditioned on a free-form scene description, rather than passing structured dialog scripts
+        through a speech-only pipeline.
+    </p>
+
+</div>
+
+
+<!-- Overlapping &amp; Synchronized Speech -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card">
+    <h2 id="overlapping" class="section-title">Overlapping &amp; Synchronized Speech</h2>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Speaker 1 Ref</th>
+                <th>Speaker 2 Ref</th>
+                <th>Prompt</th>
+                <th><b>ScenA<br>(Ours)</b></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="audio-cell">1</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m079_yml119/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m079_yml119/ref2.wav"></audio></td>
+                <td class="text-cell">Mellow piano plays gently in the background. The speaker from reference 1 says: &quot;I&#x27;m Michael.&quot; The speaker from reference 2 says: &quot;I&#x27;m Grant.&quot; Both speakers then exclaim together in absolute synchrony, voices fused as one: &quot;And we&#x27;re hijacking each other&#x27;s channels today!&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m079_yml119/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">2</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m126_yml136/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m126_yml136/ref2.wav"></audio></td>
+                <td class="text-cell">Two female speakers count in unison, voices fully overlapping: &quot;Three... two... one...&quot; Both yell together: &quot;Go!&quot; The speaker from reference 1 says: &quot;Did it actually work?&quot; The speaker from reference 2 says: &quot;I have no idea.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m126_yml136/generated.wav"></audio></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Non-Speech Vocalizations -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card">
+    <h2 id="non_speech" class="section-title">Non-Speech Vocalizations</h2>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Speaker 1 Ref</th>
+                <th>Speaker 2 Ref</th>
+                <th>Prompt</th>
+                <th><b>ScenA<br>(Ours)</b></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="audio-cell">1</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m034_yml124/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m034_yml124/ref2.wav"></audio></td>
+                <td class="text-cell">The speaker from reference 1 says: &quot;And so the way that quantum tunneling actually works—&quot; He breaks into a violent coughing fit. The speaker from reference 2 asks with concern: &quot;Are you alright?&quot; The speaker from reference 1 clears his throat and rasps: &quot;Yeah, sorry, allergies.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m034_yml124/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">2</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m026_yml166/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m026_yml166/ref2.wav"></audio></td>
+                <td class="text-cell">Both speakers desperately try to suppress laughter during something serious. The speaker from reference 1 whispers, holding back giggles: &quot;We cannot laugh right now, I&#x27;m serious.&quot; The speaker from reference 2 snickers under his breath: &quot;I&#x27;m trying, I&#x27;m trying!&quot; Both burst out laughing simultaneously.</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m026_yml166/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">3</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m002_yml142/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m002_yml142/ref2.wav"></audio></td>
+                <td class="text-cell">A male speaker (reference 1) sobs and breaks his words: &quot;I just— *sob* —I don&#x27;t know what to do— *sniff* —anymore...&quot; The speaker from reference 2 says softly: &quot;Hey. Hey. Breathe. I&#x27;m right here.&quot; The male speaker (reference 1) sniffles deeply: &quot;Okay... okay...&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m002_yml142/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">4</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m003_yml004/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m003_yml004/ref2.wav"></audio></td>
+                <td class="text-cell">The speaker from reference 1 says: &quot;And then the dog goes—&quot; He imitates a goofy bark: &quot;Woof, woof, woof!&quot; The speaker from reference 2 says flatly: &quot;And?&quot; The speaker from reference 1 keeps going: &quot;And the cat is just like, &#x27;meow.&#x27;&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m003_yml004/generated.wav"></audio></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Acoustic Scenes &amp; Sound Effects -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card">
+    <h2 id="acoustic_scenes" class="section-title">Acoustic Scenes &amp; Sound Effects</h2>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Speaker 1 Ref</th>
+                <th>Speaker 2 Ref</th>
+                <th>Prompt</th>
+                <th><b>ScenA<br>(Ours)</b></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="audio-cell">1</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m004_yml144/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m004_yml144/ref2.wav"></audio></td>
+                <td class="text-cell">A strong, continuous howling wind blows loudly throughout the entire scene without ever stopping or quieting, partially burying the voices. The speaker from reference 1 shouts loudly over the constant wind: &quot;I told you we should&#x27;ve turned back an hour ago!&quot; The speaker from reference 2 yells back over the unrelenting wind: &quot;We&#x27;re almost there, just hold on!&quot; The wind keeps howling at the same level the whole time.</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m004_yml144/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">2</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m069_yml039/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m069_yml039/ref2.wav"></audio></td>
+                <td class="text-cell">A farm at sunrise: a rooster crows. Chickens cluck softly throughout. The speaker from reference 1 says with a yawn: &quot;Way too early for this.&quot; The speaker from reference 2 chuckles: &quot;Welcome to country life.&quot; The rooster crows again.</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m069_yml039/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">3</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m044_yml154/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m044_yml154/ref2.wav"></audio></td>
+                <td class="text-cell">A train conductor&#x27;s announcement plays through speaker compression: &quot;Now arriving at Central Station. Please mind the gap as you exit the train.&quot; The speaker from reference 1 says: &quot;That&#x27;s us.&quot; The speaker from reference 2 replies: &quot;Finally, my legs are dead.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m044_yml154/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">4</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m000_yml140/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m000_yml140/ref2.wav"></audio></td>
+                <td class="text-cell">A loud, steady old grandfather clock ticks distinctly throughout, each tick clearly audible against the quiet room. The speaker from reference 1 says gently: &quot;And how did that make you feel?&quot; The speaker from reference 2 sighs deeply and replies: &quot;Honestly? Pretty awful. I haven&#x27;t been able to stop thinking about it.&quot; The clock keeps ticking distinctly.</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m000_yml140/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">5</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m060_yml030/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m060_yml030/ref2.wav"></audio></td>
+                <td class="text-cell">A roaring stadium crowd cheers continuously. A whistle blows. The speaker from reference 1 shouts excitedly: &quot;Did you see that?! What a goal!&quot; The speaker from reference 2 yells back: &quot;I told you he&#x27;d score, I told you!&quot; The crowd&#x27;s cheering swells louder. A buzzer sounds. The speaker from reference 1: &quot;We&#x27;re winning! We&#x27;re actually winning!&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m060_yml030/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">6</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m083_yml023/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m083_yml023/ref2.wav"></audio></td>
+                <td class="text-cell">Inside a packed nightclub: thumping bass-heavy electronic music dominates the entire scene. The speaker from reference 1 yells right next to the other&#x27;s ear: &quot;I&#x27;m gonna grab a drink!&quot; The speaker from reference 2 yells back: &quot;Get me one too! Vodka soda!&quot; The bass drops harder.</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m083_yml023/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">7</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m089_yml029/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m089_yml029/ref2.wav"></audio></td>
+                <td class="text-cell">An airport terminal: rolling suitcase wheels, distant chatter. A PA announcement plays: &quot;Now boarding flight 1142 to Chicago at gate B7.&quot; The speaker from reference 1 says: &quot;That&#x27;s our gate, let&#x27;s move.&quot; The speaker from reference 2 replies: &quot;Wait, I need to use the bathroom first.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m089_yml029/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">8</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m023_yml163/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m023_yml163/ref2.wav"></audio></td>
+                <td class="text-cell">A voicemail leaving over a brief beep. A short tone beeps. The speaker from reference 1 says clearly: &quot;Hey, it&#x27;s me, just calling to check in. Give me a buzz when you get this.&quot; A short pause. The speaker from reference 2&#x27;s voice plays back through a phone speaker, slightly tinny: &quot;Got it, calling you back now.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m023_yml163/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">9</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m001_yml141/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m001_yml141/ref2.wav"></audio></td>
+                <td class="text-cell">The speaker from reference 1 announces dramatically: &quot;Ladies and gentlemen, prepare to be amazed... behold!&quot; A loud, sharp WHOOSH followed by a hiss as a thick puff of stage smoke bursts out. The speaker from reference 2 gasps and says: &quot;Wait, where did the rabbit come from?!&quot; The speaker from reference 1 chuckles smugly: &quot;A magician never tells.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m001_yml141/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">10</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m031_yml121/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m031_yml121/ref2.wav"></audio></td>
+                <td class="text-cell">A sudden interrupting moment with sound effects. The speaker from reference 1 says: &quot;Today we&#x27;re gonna talk about why bees actually—&quot; A loud bee buzzes right past the mic. The speaker from reference 1 yelps: &quot;Ow! Did that just happen on camera?!&quot; The speaker from reference 2 laughs and says: &quot;I think the bees heard you.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m031_yml121/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">11</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m035_yml125/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m035_yml125/ref2.wav"></audio></td>
+                <td class="text-cell">The speaker from reference 1 says: &quot;Anyway, that&#x27;s why prime numbers are so—&quot; A loud doorbell rings sharply, cutting him off mid-sentence. The speaker from reference 1 sighs: &quot;One second.&quot; The speaker from reference 2 chuckles and says: &quot;We&#x27;ll just leave that in.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m035_yml125/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">12</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m003/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m003/ref2.wav"></audio></td>
+                <td class="text-cell">The speaker from reference 1 fires: &quot;Capital of France?&quot; The speaker from reference 2 instantly: &quot;Paris!&quot; The speaker from reference 1: &quot;Square root of eighty-one?&quot; The speaker from reference 2: &quot;Nine!&quot; The speaker from reference 1: &quot;Year of moon landing?&quot; The speaker from reference 2: &quot;Sixty-nine!&quot; A loud, harsh game-show buzzer rings out — a sustained electronic BZZZZT.</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m003/generated.wav"></audio></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Described Voices (No Reference) -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card">
+    <h2 id="described_voices" class="section-title">Described Voices (Single Reference)</h2>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Speaker 1 Ref</th>
+                <th>Speaker 2 Ref</th>
+                <th>Prompt</th>
+                <th><b>ScenA<br>(Ours)</b></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="audio-cell">1</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m001_yml002/ref1.wav"></audio></td>
+                <td class="audio-cell" style="color:#999; font-style:italic;">&mdash; described in prompt &mdash;</td>
+                <td class="text-cell">A speaker (from reference 1) interacts with a deep, booming, intimidating man&#x27;s voice. The speaker says nervously: &quot;Are you... sure I&#x27;m allowed in here?&quot; The deep voice replies in a low, thunderous baritone: &quot;You are now. Don&#x27;t make me regret it.&quot; The speaker swallows audibly and says: &quot;Got it.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m001_yml002/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">2</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m044_yml054/ref1.wav"></audio></td>
+                <td class="audio-cell" style="color:#999; font-style:italic;">&mdash; described in prompt &mdash;</td>
+                <td class="text-cell">A man&#x27;s voice (from reference 1) and a small cheerful child (around five years old, high-pitched, slightly lispy) are talking. The man says: &quot;What did you do at school today, buddy?&quot; The child replies in a high, cheerful voice: &quot;We painted dinosaurs! Mine was purple!&quot; The man laughs warmly: &quot;Purple dinosaurs are the best kind.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m044_yml054/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">3</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m047_yml057/ref1.wav"></audio></td>
+                <td class="audio-cell" style="color:#999; font-style:italic;">&mdash; described in prompt &mdash;</td>
+                <td class="text-cell">A speaker (from reference 1) and a raspy, gruff old sailor with a hoarse, weathered voice talk. The speaker asks: &quot;Have you ever seen anything like it?&quot; The sailor replies in a deep raspy growl: &quot;Once. Long time ago. Lost three good men that night.&quot; A pause. The speaker says quietly: &quot;Tell me about them.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m047_yml057/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">4</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m049_yml059/ref1.wav"></audio></td>
+                <td class="audio-cell" style="color:#999; font-style:italic;">&mdash; described in prompt &mdash;</td>
+                <td class="text-cell">A speaker (from reference 1) talks with a posh, refined British woman with a crisp Received Pronunciation accent. The speaker says: &quot;How was the play?&quot; The British woman replies in a precise, plummy English accent: &quot;Absolutely marvelous, darling. The lead was simply divine, you really must go.&quot; The speaker says: &quot;I&#x27;ll get tickets tomorrow.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m049_yml059/generated.wav"></audio></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Voice Acting &amp; Impressions -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card">
+    <h2 id="voice_acting" class="section-title">Voice Acting &amp; Impressions</h2>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Speaker 1 Ref</th>
+                <th>Speaker 2 Ref</th>
+                <th>Prompt</th>
+                <th><b>ScenA<br>(Ours)</b></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="audio-cell">1</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m043_yml153/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m043_yml153/ref2.wav"></audio></td>
+                <td class="text-cell">A fake drill sergeant impression. The speaker from reference 1 yells gruffly like a drill sergeant: &quot;Drop and give me twenty, soldier!&quot; The speaker from reference 2 laughs and replies: &quot;I&#x27;m literally just trying to eat my cereal.&quot; The speaker from reference 1 keeps yelling: &quot;I said TWENTY!&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m043_yml153/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">2</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m048_yml158/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m048_yml158/ref2.wav"></audio></td>
+                <td class="text-cell">One speaker briefly switches into a fake Italian accent for emphasis. The speaker from reference 1 says: &quot;I made the spaghetti from scratch tonight.&quot; The speaker from reference 2 replies in an exaggerated theatrical Italian accent: &quot;Mamma mia, that-a smells-a delizioso!&quot; The speaker from reference 1 laughs.</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m048_yml158/generated.wav"></audio></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Conversational &amp; Emotional Range -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card">
+    <h2 id="conversational" class="section-title">Conversational &amp; Emotional Range</h2>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Speaker 1 Ref</th>
+                <th>Speaker 2 Ref</th>
+                <th>Prompt</th>
+                <th><b>ScenA<br>(Ours)</b></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="audio-cell">1</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m027_yml167/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m027_yml167/ref2.wav"></audio></td>
+                <td class="text-cell">A polite interview rhythm. The speaker from reference 1 asks: &quot;So tell me, what got you started in this field?&quot; The speaker from reference 2 replies thoughtfully: &quot;Honestly, it was a complete accident. A friend dragged me to a lecture and I never looked back.&quot; The speaker from reference 1 says: &quot;I love that.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m027_yml167/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">2</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m033_yml143/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m033_yml143/ref2.wav"></audio></td>
+                <td class="text-cell">An emotional shift from calm to angry over the course of the scene. The speaker from reference 1 says calmly: &quot;I&#x27;m really trying to stay patient with you here.&quot; The speaker from reference 2 replies dismissively: &quot;Yeah, well, try harder.&quot; The speaker from reference 1&#x27;s voice rises sharply: &quot;What did you just say to me?!&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m033_yml143/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">3</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m070_yml110/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m070_yml110/ref2.wav"></audio></td>
+                <td class="text-cell">A relaxed chat between roommates. The speaker from reference 1 says: &quot;Did you remember to take out the trash?&quot; The speaker from reference 2 replies: &quot;Yep, did it this morning.&quot; The speaker from reference 1 says: &quot;You&#x27;re a lifesaver.&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m070_yml110/generated.wav"></audio></td>
+            </tr>
+            <tr>
+                <td class="audio-cell">4</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m071_yml111/ref1.wav"></audio></td>
+                <td class="audio-cell"><audio controls><source src="content/item_m071_yml111/ref2.wav"></audio></td>
+                <td class="text-cell">Two coworkers commenting on a meeting. The speaker from reference 1 says: &quot;That meeting could&#x27;ve been an email.&quot; The speaker from reference 2 replies with a sigh: &quot;It always could&#x27;ve been an email.&quot; The speaker from reference 1 chuckles: &quot;Why do we keep going?&quot;</td>
+                <td class="audio-cell"><audio controls><source src="content/item_m071_yml111/generated.wav"></audio></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Leaderboard -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card">
+    <h2 id="leaderboard" class="section-title">Leaderboard</h2>
+    <p class="metric-legend">
+        Comparison with multi-speaker dialogue baselines on
+        <strong>CoVoMix2-Dialogue-20s</strong>.
+        <strong>Bold</strong> = best, <u>underline</u> = second-best within each column.
+        <strong>cpWER ↓</strong>: concatenated min-permutation WER for two-speaker dialogue.
+        <strong>cpSIM ↑</strong>: concatenated min-permutation SIM-O for two-speaker turns.
+        <strong>ACC ↑</strong>: speaker-turn assignment accuracy.
+        <strong>WER ↓</strong>: Word Error Rate.
+        <strong>SIM-O ↑</strong>: speaker similarity to the prompt (embedding cosine, 0–1).
+        <strong>UTMOS ↑</strong>: predicted naturalness MOS (1–5).
+        <strong>SQUIM ↑</strong>: predicted speech quality (TorchAudio-SQUIM MOS).
+    </p>
+    <div class="table-responsive pt-3">
+        <table id="leaderboard-table" class="table table-hover">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0)">Method</th>
+                <th onclick="sortTable(1)">cpWER ↓</th>
+                <th onclick="sortTable(2)">cpSIM ↑</th>
+                <th onclick="sortTable(3)">ACC ↑</th>
+                <th onclick="sortTable(4)">WER ↓</th>
+                <th onclick="sortTable(5)">SIM-O ↑</th>
+                <th onclick="sortTable(6)">UTMOS ↑</th>
+                <th onclick="sortTable(7)">SQUIM ↑</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><a href="https://www.open-moss.com/en/moss-ttsd/" target="_blank">MOSS-TTSD</a></td>
+                <td>0.232</td>
+                <td><u>0.547</u></td>
+                <td><u>0.855</u></td>
+                <td>0.109</td>
+                <td>0.443</td>
+                <td><b>3.76</b></td>
+                <td>4.28</td>
+            </tr>
+            <tr>
+                <td><a href="https://microsoft.github.io/VibeVoice/" target="_blank">VibeVoice-7B</a></td>
+                <td>0.206</td>
+                <td>0.527</td>
+                <td>0.821</td>
+                <td>0.044</td>
+                <td><b>0.451</b></td>
+                <td><u>3.58</u></td>
+                <td>4.28</td>
+            </tr>
+            <tr>
+                <td><a href="https://microsoft.github.io/VibeVoice/" target="_blank">VibeVoice-1.5B</a></td>
+                <td>0.212</td>
+                <td>0.503</td>
+                <td>0.830</td>
+                <td>0.050</td>
+                <td>0.423</td>
+                <td>3.56</td>
+                <td>4.27</td>
+            </tr>
+            <tr>
+                <td><a href="https://zipvoice.github.io/" target="_blank">ZipVoice-Dialog</a></td>
+                <td><u>0.176</u></td>
+                <td>0.538</td>
+                <td>0.847</td>
+                <td><u>0.032</u></td>
+                <td><u>0.446</u></td>
+                <td>3.57</td>
+                <td><b>4.34</b></td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/nari-labs/dia" target="_blank">Dia (Nari Labs)</a></td>
+                <td>0.303</td>
+                <td>0.339</td>
+                <td>0.757</td>
+                <td>0.133</td>
+                <td>0.312</td>
+                <td>2.69</td>
+                <td>4.09</td>
+            </tr>
+            <tr class="ours-row">
+                <td>ScenA (Ours)</td>
+                <td><b>0.145</b></td>
+                <td><b>0.567</b></td>
+                <td><b>0.866</b></td>
+                <td><b>0.020</b></td>
+                <td><b>0.451</b></td>
+                <td>3.44</td>
+                <td><u>4.32</u></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- BibTeX -->
+<div class="container pt-5 mt-5 mb-5 bg-white rounded section-card">
+    <h2 id="bibtex" class="section-title">BibTeX</h2>
+    <pre class="bibtex"><code>@article{finkelson2026scena,
+  title   = {{ScenA}: Reference-Driven Multi-Speaker Audio Scene Generation from In-the-Wild Priors},
+  author  = {Finkelson, Michael and Segal, Daniel and Richardson, Eitan and Armon, Shahar and Goldring, Nani and Panet, Poriya and Brazowski, Benjamin and Patashnik, Or and HaCohen, Yoav},
+  journal = {arXiv preprint arXiv:XXXX.XXXXX},
+  year    = {2026}
+}</code></pre>
+</div>
+
+
+</article>
+</main>
+
+</div>
+
+
+<script>
+function sortTable(n) {
+    const table = document.getElementById("leaderboard-table");
+    const headers = table.getElementsByTagName("th");
+    let dir = "asc";
+    if (headers[n].classList.contains("sorted-asc")) dir = "desc";
+    for (let h of headers) h.classList.remove("sorted-asc", "sorted-desc");
+    headers[n].classList.add(dir === "asc" ? "sorted-asc" : "sorted-desc");
+
+    let switching = true;
+    while (switching) {
+        switching = false;
+        const rows = table.rows;
+        for (let i = 1; i < rows.length - 1; i++) {
+            const xText = rows[i].cells[n].innerText;
+            const yText = rows[i + 1].cells[n].innerText;
+            const xv = parseFloat(xText.replace(/[^\d.\-]/g, ""));
+            const yv = parseFloat(yText.replace(/[^\d.\-]/g, ""));
+            let shouldSwitch;
+            if (!isNaN(xv) && !isNaN(yv)) {
+                shouldSwitch = dir === "asc" ? xv > yv : xv < yv;
+            } else {
+                shouldSwitch = dir === "asc"
+                    ? xText.toLowerCase() > yText.toLowerCase()
+                    : xText.toLowerCase() < yText.toLowerCase();
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                break;
+            }
+        }
+    }
+}
+</script>
+
+</body>
+</html>
