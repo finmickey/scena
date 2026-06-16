@@ -74,8 +74,6 @@
         without any per-turn structure. Concretely, reference latents are concatenated into the model's token
         sequence and distinguished by lightweight identity-aware positional encodings. However, we identify a
         critical obstacle to this approach: the <em>Reference Shortcut</em>.
-    </p>
-    <p>
         During training under standard noise schedules, the model can identify the matching reference by acoustic
         similarity to the noisy target, bypassing the text prompt entirely. We address this with a high-noise-biased
         timestep distribution that forces the model to rely on the text prompt for speaker assignment. We evaluate
