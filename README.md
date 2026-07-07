@@ -11,6 +11,11 @@ architecture (~4B parameters).
   🤗 <a href="https://huggingface.co/mifinkelson/scena">Model</a>
 </p>
 
+<p align="center">
+  <img src="static/images/teaser.png" width="880"
+       alt="ScenA teaser: a natural-language prompt and a set of reference voices are transformed into a multi-speaker conversational scene with overlapping speech, paralinguistic events, and ambient audio.">
+</p>
+
 ## Install
 
 ```bash
