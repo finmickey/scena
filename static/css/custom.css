@@ -141,34 +141,6 @@ body {
     font-size: 0.95em;
 }
 
-/* "Coming soon" placeholder buttons (not yet clickable) */
-.link-button.soon {
-    background-color: #fff;
-    color: var(--color-navy) !important;
-    border: 1.5px dashed var(--color-indigo);
-    box-shadow: none;
-    cursor: default;
-}
-
-.link-button.soon:hover {
-    background-color: #fff;
-    border-color: var(--color-indigo);
-    transform: none;
-    box-shadow: none;
-}
-
-.soon-badge {
-    margin-left: 0.45rem;
-    padding: 0.12rem 0.5rem;
-    border-radius: 999px;
-    background-color: var(--color-indigo);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
 
 /* ---------- Teaser ----------------------------------------- */
 img.teaser {
