@@ -1,1 +1,18 @@
 .DS_Store
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+build/
+dist/
+checkpoints/
+gemma-3-12b-it/
+
+# generated audio outputs (keep examples/references/*.wav)
+/buzzer_fresh.wav
+/buzzer.wav
+/farm.wav
+/out.wav
+
+# internal reproduction notes — not for publication
+ScenA_reproduction_handoff.md
