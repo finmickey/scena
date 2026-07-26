@@ -45,13 +45,22 @@ def _repeat_state(state: LatentState, n: int) -> LatentState:
         repeats[0] = n
         return t.repeat(repeats)
 
-    return LatentState(
+    repeated = LatentState(
         latent=_repeat(state.latent),
         denoise_mask=_repeat(state.denoise_mask),
         positions=_repeat(state.positions),
         clean_latent=_repeat(state.clean_latent),
         attention_mask=_repeat(state.attention_mask) if state.attention_mask is not None else None,
     )
+    # Preserve the informal ``_ref_cond_ids`` attribute (stashed via
+    # object.__setattr__ by RefCondDenoiser). It is NOT a LatentState field, so it
+    # would otherwise be dropped here, silently disabling reference-conditioning
+    # embeddings in the batched-guidance path (reference_1/reference_2 become
+    # indistinguishable -> speaker binding collapses while audio quality is intact).
+    ref_cond_ids = getattr(state, "_ref_cond_ids", None)
+    if ref_cond_ids is not None:
+        object.__setattr__(repeated, "_ref_cond_ids", _repeat(ref_cond_ids))
+    return repeated
 
 
 def _guided_denoise(  # noqa: PLR0913,PLR0915
